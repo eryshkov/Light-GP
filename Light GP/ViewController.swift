@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
 
@@ -23,10 +24,19 @@ class ViewController: UIViewController {
     }
     
     func updateView() {
-        if isLightOn {
-            view.backgroundColor = UIColor.white
-        }else{
-            view.backgroundColor = UIColor.black
+        let device = AVCaptureDevice.default(for: AVMediaType.video)
+        
+        if let dev = device, dev.hasTorch {
+            view.backgroundColor = .black
+            do {
+                try dev.lockForConfiguration()
+                dev.torchMode = isLightOn ? .on : .off
+                dev.unlockForConfiguration()
+            } catch {
+                print(error)
+            }
+        } else {
+            view.backgroundColor = isLightOn ? .white : .black
         }
     }
     
